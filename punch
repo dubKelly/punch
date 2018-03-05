@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
 import sys
+import datetime
 
 def parse_args():
   for arg in sys.argv:
     if arg == 'in':
-      open('punch_card.json', 'w')
+      # open('punch_card.json', 'w')
+      date = datetime.datetime.now().date()
+      print(date)
+      time = datetime.datetime.now().time()
+      print(time)
 
 def main():
   parse_args()
