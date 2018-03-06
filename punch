@@ -10,25 +10,32 @@ import datetime
 #     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
   args = {
-    'commands': {
-      'in': {
-        'command': ['in'],
-        'help': ['in', 'Punch in at current date/time']
+    u'commands': {
+      u'in': {
+        u'command': ['in'],
+        u'help': ['in', 'Punch in at current date/time']
       },
-      'out': {
-        'command': ['out'],
-        'help': ['out', 'Punch out at current date/time']
+      u'out': {
+        u'command': ['out'],
+        u'help': ['out', 'Punch out at current date/time']
       }
     },
-    'flags': {
-      'help': {
-        'flag': ['-h', '--help'],
+    u'flags': {
+      u'help': {
+        u'flag': ['-h', '--help'],
       }
     }
   }
 
-  for arg in sys.argv:
-    
+  def recursion(d):
+    for k, v in d.items():
+      if isinstance(v, dict):
+        recursion(v)
+      else:
+        print('{0} : {1}'.format(k, v))
+
+  recursion(args)
+
 
 def main():
   parse_args()
