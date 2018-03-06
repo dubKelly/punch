@@ -9,7 +9,7 @@ def parse_args():
       # open('punch_card.json', 'w')
       date = datetime.datetime.now().date()
       print(date)
-      time = datetime.datetime.now().time()
+      time = str(datetime.datetime.now().time())[:8]
       print(time)
 
 def main():
