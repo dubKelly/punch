@@ -3,14 +3,32 @@
 import sys
 import datetime
 
+# for arg in sys.argv:
+#   if arg == 'in':
+#     # open('punch_card.json', 'w')
+#     date = datetime.datetime.now().date()
+#     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
+  args = {
+    'commands': {
+      'in': {
+        'command': ['in'],
+        'help': ['in', 'Punch in at current date/time']
+      },
+      'out': {
+        'command': ['out'],
+        'help': ['out', 'Punch out at current date/time']
+      }
+    },
+    'flags': {
+      'help': {
+        'flag': ['-h', '--help'],
+      }
+    }
+  }
+
   for arg in sys.argv:
-    if arg == 'in':
-      # open('punch_card.json', 'w')
-      date = datetime.datetime.now().date()
-      print(date)
-      time = str(datetime.datetime.now().time())[:8]
-      print(time)
+    
 
 def main():
   parse_args()
