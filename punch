@@ -10,31 +10,33 @@ import datetime
 #     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
   args = {
-    u'commands': {
-      u'in': {
-        u'command': ['in'],
-        u'help': ['in', 'Punch in at current date/time']
-      },
-      u'out': {
-        u'command': ['out'],
-        u'help': ['out', 'Punch out at current date/time']
-      }
+    'in': {
+      'func': 'in',
+      'switch': ['in'],
+      'help': ['in', 'Punch in at current date/time']
     },
-    u'flags': {
-      u'help': {
-        u'flag': ['-h', '--help'],
-      }
+    'out': {
+      'func': 'out',
+      'switch': ['out'],
+      'help': ['out', 'Punch out at current date/time']
+    },
+    'help': {
+      'func': 'help',
+      'switch': ['-h', '--help'],
     }
   }
 
-  def recursion(d):
+  def match_args(d, query):
     for k, v in d.items():
       if isinstance(v, dict):
-        recursion(v)
-      else:
-        print('{0} : {1}'.format(k, v))
+        match_args(v, query)
+      elif k == 'switch':
+        for i in v:
+          if i == query:
+            print(i)
 
-  recursion(args)
+  for arg in sys.argv[1:]:
+    match_args(args, arg)
 
 
 def main():
