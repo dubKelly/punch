@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import json
 import sys
+import getpass
 import datetime
 
 # for arg in sys.argv:
@@ -9,35 +11,31 @@ import datetime
 #     date = datetime.datetime.now().date()
 #     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
-  args = {
-    'in': {
-      'func': 'in',
-      'switch': ['in'],
-      'help': ['in', 'Punch in at current date/time']
-    },
-    'out': {
-      'func': 'out',
-      'switch': ['out'],
-      'help': ['out', 'Punch out at current date/time']
-    },
-    'help': {
-      'func': 'help',
-      'switch': ['-h', '--help'],
-    }
-  }
-
-  def match_args(d, query):
-    for k, v in d.items():
-      if isinstance(v, dict):
-        match_args(v, query)
-      elif k == 'switch':
-        for i in v:
-          if i == query:
-            print(i)
-
   for arg in sys.argv[1:]:
-    match_args(args, arg)
+    if arg == 'in':
+      punch_in()
 
+def punch_in():
+  user = getpass.getuser()
+  date = str(datetime.datetime.now().date())
+  time = str(datetime.datetime.now().time())[:8]
+
+  # punch_card = {
+  #   user: {
+  #     date: {
+  #       time: 'in'
+  #     }
+  #   }
+  # }
+  #
+  # print(punch_card[user][date])
+  with open('punchcard.json', 'r+') as punchcard:
+    _file = json.load(punchcard)
+    if _file[user]:
+      if _file[user][date]:
+        _file[user][date][time] = 'in'
+
+    json.dump(_file, punchcard)
 
 def main():
   parse_args()
