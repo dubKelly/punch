@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import os.path
 import sys
 import getpass
 import datetime
@@ -20,22 +21,25 @@ def punch_in():
   date = str(datetime.datetime.now().date())
   time = str(datetime.datetime.now().time())[:8]
 
-  # punch_card = {
-  #   user: {
-  #     date: {
-  #       time: 'in'
-  #     }
-  #   }
-  # }
-  #
-  # print(punch_card[user][date])
-  with open('punchcard.json', 'r+') as punchcard:
-    _file = json.load(punchcard)
-    if _file[user]:
-      if _file[user][date]:
-        _file[user][date][time] = 'in'
+  clock_in = {
+    user: {
+      date: {
+        time: 'in'
+      }
+    }
+  }
 
-    json.dump(_file, punchcard)
+  if not os.path.exists('./punchcard.json'):
+    with open('punchcard.json', 'w+') as punchcard:
+      json.dump(clock_in, punchcard)
+  else:
+    with open('punchcard.json', 'r+') as punchcard:
+      _file = json.load(punchcard)
+      if _file[user]:
+        if _file[user][date]:
+          punch_card = {**_file[user][date], **clock_in[user][date]}
+
+      json.dump(punch_card, punchcard)
 
 def main():
   parse_args()
