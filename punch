@@ -13,33 +13,37 @@ import datetime
 #     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
   for arg in sys.argv[1:]:
-    if arg == 'in':
-      punch_in()
+    if arg == 'in' or arg == 'out':
+      punch(arg)
 
-def punch_in():
+def punch(option):
   user = getpass.getuser()
   date = str(datetime.datetime.now().date())
   time = str(datetime.datetime.now().time())[:8]
 
-  clock_in = {
+  clock = {
     user: {
       date: {
-        time: 'in'
+        time: option
       }
     }
   }
 
   if not os.path.exists('./punchcard.json'):
-    with open('punchcard.json', 'w+') as punchcard:
-      json.dump(clock_in, punchcard)
+    write_file('punchcard.json', clock)
   else:
-    with open('punchcard.json', 'r+') as punchcard:
-      _file = json.load(punchcard)
-      if _file[user]:
-        if _file[user][date]:
-          punch_card = {**_file[user][date], **clock_in[user][date]}
+    with open('punchcard.json', 'r') as punchcard:
+      punch_card = json.load(punchcard)
+      if punch_card[user]:
+        if punch_card[user][date]:
+          time = {**punch_card[user][date], **clock[user][date]}
+          punch_card[user][date] = time
 
-      json.dump(punch_card, punchcard)
+      write_file('punchcard.json', punch_card)
+
+def write_file(_file, update):
+  with open(_file, 'w+') as punchcard:
+    json.dump(update, punchcard)
 
 def main():
   parse_args()
