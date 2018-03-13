@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import collections
 import json
 import os.path
 import sys
@@ -17,9 +18,11 @@ def parse_args():
       punch(arg)
 
 def punch(option):
-  user = getpass.getuser()
+  # user = getpass.getuser()
+  user = 'test'
   date = str(datetime.datetime.now().date())
   time = str(datetime.datetime.now().time())[:8]
+  filename = 'punchcard.json'
 
   clock = {
     user: {
@@ -29,21 +32,36 @@ def punch(option):
     }
   }
 
-  if not os.path.exists('./punchcard.json'):
-    write_file('punchcard.json', clock)
+  if not os.path.exists('./' + filename):
+    write_file(filename, clock, 'w+')
   else:
-    with open('punchcard.json', 'r') as punchcard:
+    with open(filename, 'r') as punchcard:
       punch_card = json.load(punchcard)
-      if punch_card[user]:
-        if punch_card[user][date]:
-          time = {**punch_card[user][date], **clock[user][date]}
-          punch_card[user][date] = time
+      if user in punch_card:
+        if date in punch_card[user]:
+          index = len(punch_card[user][date]) - 1
+          status = list(collections.OrderedDict(punch_card[user][date]).items())[index][1]
+          if not status == clock[user][date][time]:
+            time = {**punch_card[user][date], **clock[user][date]}
+            punch_card[user][date] = collections.OrderedDict(sorted(time.items()))
 
-      write_file('punchcard.json', punch_card)
+            write_file(filename, punch_card, 'w')
+          else:
+            print(f"You're already punched {status}")
 
-def write_file(_file, update):
-  with open(_file, 'w+') as punchcard:
-    json.dump(update, punchcard)
+        else:
+          new_date = {**punch_card[user], **clock[user]}
+          punch_card[user] = collections.OrderedDict(sorted(new_date.items()))
+
+          write_file(filename, punch_card, 'w')
+      else:
+        punch_card = {**punch_card, **clock}
+
+        write_file(filename, punch_card, 'w')
+
+def write_file(_file, update, mode):
+  with open(_file, mode) as punchcard:
+    json.dump(update, punchcard, indent=2)
 
 def main():
   parse_args()
