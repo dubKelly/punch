@@ -91,9 +91,10 @@ def total_hours(punchcard):
       sfm_total += i - sfm_list[index - 1]
 
   total_hr = int(sfm_total / 3600)
-  total_min = int((sfm_total - total_hr) / 60)
+  total_min = int((sfm_total - (total_hr * 3600)) / 60)
   total_sec = int(sfm_total - ((total_hr * 3600) + (total_min * 60)))
   total = f"{total_hr}:{total_min}:{total_sec}"
+
   print(f"Total Hours: {total}")
 
 def main():
