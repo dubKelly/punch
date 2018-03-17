@@ -20,8 +20,6 @@ def parse_args():
       display()
 
 def punch(option):
-  global time
-
   clock = {
     user: {
       date: {
@@ -32,7 +30,8 @@ def punch(option):
 
   # check if file exists
   if not os.path.exists('./' + filename):
-    write_file(filename, clock, 'w+')
+    write_file(filename, clock, 'w+', option)
+    print("Punched {option} at {time} on {date}")
   else:
     with open(filename, 'r') as punchcard:
       punch_card = json.load(punchcard)
@@ -44,10 +43,10 @@ def punch(option):
           status = list(collections.OrderedDict(punch_card[user][date]).items())[index][1]
           # make sure user isn't punching in/out twice
           if not status == clock[user][date][time]:
-            time = {**punch_card[user][date], **clock[user][date]}
-            punch_card[user][date] = collections.OrderedDict(sorted(time.items()))
+            new_time = {**punch_card[user][date], **clock[user][date]}
+            punch_card[user][date] = collections.OrderedDict(sorted(new_time.items()))
 
-            write_file(filename, punch_card, 'w')
+            write_file(filename, punch_card, 'w', option)
           else:
             print(f"You're already punched {status}")
 
@@ -55,15 +54,16 @@ def punch(option):
           new_date = {**punch_card[user], **clock[user]}
           punch_card[user] = collections.OrderedDict(sorted(new_date.items()))
 
-          write_file(filename, punch_card, 'w')
+          write_file(filename, punch_card, 'w', option)
       else:
         punch_card = {**punch_card, **clock}
 
-        write_file(filename, punch_card, 'w')
+        write_file(filename, punch_card, 'w', option)
 
-def write_file(_file, update, mode):
+def write_file(_file, update, mode, option):
   with open(_file, mode) as punchcard:
     json.dump(update, punchcard, indent=2)
+    print(f"Punched {option} at {time} on {date}")
 
 def display():
   with open(filename, 'r') as punchcard:
