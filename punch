@@ -7,16 +7,20 @@ import sys
 import getpass
 import datetime
 
+user = getpass.getuser()
+date = str(datetime.datetime.now().date())
+time = str(datetime.datetime.now().time())[:8]
+filename = 'punchcard.json'
+
 def parse_args():
   for arg in sys.argv[1:]:
     if arg == 'in' or arg == 'out':
       punch(arg)
+    elif arg == '-d' or arg == '--display':
+      display()
 
 def punch(option):
-  user = getpass.getuser()
-  date = str(datetime.datetime.now().date())
-  time = str(datetime.datetime.now().time())[:8]
-  filename = 'punchcard.json'
+  global time
 
   clock = {
     user: {
@@ -60,6 +64,37 @@ def punch(option):
 def write_file(_file, update, mode):
   with open(_file, mode) as punchcard:
     json.dump(update, punchcard, indent=2)
+
+def display():
+  with open(filename, 'r') as punchcard:
+    punch_card = json.load(punchcard)
+
+    total_hours(punch_card)
+
+def total_hours(punchcard):
+  sfm_list = []
+  sfm_total = 0
+
+  for days, hours in punchcard[user].items():
+    # convert string to seconds from midnight
+    for k, v in hours.items():
+      sfm_hr = int(k[:2]) * 60 ** 2
+      sfm_min = int(k[3:5]) * 60
+      sfm_sec = int(k[6:])
+      sfm = sfm_hr + sfm_min + sfm_sec
+
+      sfm_list.append(sfm)
+  for i in sfm_list:
+    index = sfm_list.index(i)
+
+    if not index % 2 == 0:
+      sfm_total += i - sfm_list[index - 1]
+
+  total_hr = int(sfm_total / 3600)
+  total_min = int((sfm_total - total_hr) / 60)
+  total_sec = int(sfm_total - ((total_hr * 3600) + (total_min * 60)))
+  total = f"{total_hr}:{total_min}:{total_sec}"
+  print(f"Total Hours: {total}")
 
 def main():
   parse_args()
