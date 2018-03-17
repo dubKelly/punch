@@ -7,19 +7,13 @@ import sys
 import getpass
 import datetime
 
-# for arg in sys.argv:
-#   if arg == 'in':
-#     # open('punch_card.json', 'w')
-#     date = datetime.datetime.now().date()
-#     time = str(datetime.datetime.now().time())[:8]
 def parse_args():
   for arg in sys.argv[1:]:
     if arg == 'in' or arg == 'out':
       punch(arg)
 
 def punch(option):
-  # user = getpass.getuser()
-  user = 'test'
+  user = getpass.getuser()
   date = str(datetime.datetime.now().date())
   time = str(datetime.datetime.now().time())[:8]
   filename = 'punchcard.json'
@@ -32,15 +26,19 @@ def punch(option):
     }
   }
 
+  # check if file exists
   if not os.path.exists('./' + filename):
     write_file(filename, clock, 'w+')
   else:
     with open(filename, 'r') as punchcard:
       punch_card = json.load(punchcard)
+      #check if current user has punched in before
       if user in punch_card:
+        # check if user has punched in today
         if date in punch_card[user]:
           index = len(punch_card[user][date]) - 1
           status = list(collections.OrderedDict(punch_card[user][date]).items())[index][1]
+          # make sure user isn't punching in/out twice
           if not status == clock[user][date][time]:
             time = {**punch_card[user][date], **clock[user][date]}
             punch_card[user][date] = collections.OrderedDict(sorted(time.items()))
